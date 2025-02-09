@@ -23,6 +23,7 @@ public class ErrorController {
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<APIErrorResponse> handleIllegalArgumentException(
             IllegalArgumentException ex) {
         APIErrorResponse errorResponse = APIErrorResponse.builder()
@@ -30,5 +31,15 @@ public class ErrorController {
                 .message(ex.getMessage())
                 .build();
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<APIErrorResponse> handleIllegalStateException(
+            IllegalStateException ex) {
+        APIErrorResponse errorResponse = APIErrorResponse.builder()
+                .status(HttpStatus.CONFLICT.value())
+                .message(ex.getMessage())
+                .build();
+        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
     }
 }
