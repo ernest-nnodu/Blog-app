@@ -1,6 +1,8 @@
 package com.example.blog.app.service.impl;
 
 import com.example.blog.app.service.AuthenticationService;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwt;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -48,6 +50,21 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .setExpiration((new Date(System.currentTimeMillis() + jwtExpiryMs)))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
+    }
+
+    @Override
+    public UserDetails validateToken(String token) {
+        String username = extractUsername(token);
+        return userDetailsService.loadUserByUsername(username);
+    }
+
+    private String extractUsername(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+        return claims.getSubject();
     }
 
     private Key getSigningKey() {
